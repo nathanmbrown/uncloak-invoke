@@ -48,8 +48,10 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
     }
-}
 
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.20")
+
+}
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
