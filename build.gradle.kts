@@ -49,9 +49,10 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
     }
 
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.0.20")
-
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.10")
+    compileOnly(files("C:\\Users\\Nathan\\AppData\\Local\\Programs\\IntelliJ IDEA Community Edition\\plugins\\Kotlin\\lib\\kotlin-plugin.jar"))
 }
+
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {

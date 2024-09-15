@@ -1,25 +1,24 @@
 package com.github.nathanmbrown.uncloakinvoke
 
-import com.intellij.codeInsight.hints.ChangeListener
-import com.intellij.codeInsight.hints.FactoryInlayHintsCollector
-import com.intellij.codeInsight.hints.ImmediateConfigurable
-import com.intellij.codeInsight.hints.InlayHintsCollector
-import com.intellij.codeInsight.hints.InlayHintsProvider
-import com.intellij.codeInsight.hints.InlayHintsSink
-import com.intellij.codeInsight.hints.NoSettings
-import com.intellij.codeInsight.hints.SettingsKey
+import com.intellij.codeInsight.hints.*
+import com.intellij.codeInsight.hints.presentation.InlayPresentation
+import com.intellij.ide.util.PsiNavigationSupport
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.refactoring.suggested.endOffset
 import com.intellij.ui.dsl.builder.panel
-import org.jetbrains.kotlin.analyzer.AnalysisResult
-import javax.swing.JComponent
+import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.idea.caches.resolve.analyze
+import org.jetbrains.kotlin.idea.intentions.isInvokeOperator
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtFunction
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
-import org.jetbrains.kotlin.psi.KtVisitorVoid
-import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
-import org.jetbrains.kotlin.idea.caches.resolve
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.calls.util.getResolvedCall
+import org.jetbrains.kotlin.resolve.source.KotlinSourceElement
+import javax.swing.JComponent
 
 class InvokeInlayProvider : InlayHintsProvider<NoSettings> {
     override val key: SettingsKey<NoSettings>
@@ -44,28 +43,51 @@ class InvokeInlayProvider : InlayHintsProvider<NoSettings> {
         editor: Editor,
         settings: NoSettings,
         sink: InlayHintsSink
-    ): InlayHintsCollector? =
+    ): InlayHintsCollector =
         object : FactoryInlayHintsCollector(editor) {
             override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
                 if (element is KtCallExpression) {
-//                    val calleeExpression = element.calleeExpression
-//                    if (calleeExpression is KtNameReferenceExpression) {
-                    element.safeAnalyzeNonSourceRootCode(BodyResolveMode.PARTIAL_WITH_CFA)
-//                        val resolved = calleeExpression.reference?.resolve()
-                        // Check if the resolved function is an `invoke` operator
-//                        if (resolved is KtFunction) {
-//                            println("$resolved")
-//                            val offset = element.textOffset + element.textLength
-//                            sink.addInlineElement(
-//                                offset,
-//                                true,
-//                                factory.text(".invoke"),
-//                                false
-//                            )
-//                        }
-//                    }
+                    val bindingContext: BindingContext = element.analyze()
+                    val resolvedCall: ResolvedCall<out CallableDescriptor>? = element.getResolvedCall(bindingContext)
+                    val functionDescriptor = resolvedCall?.resultingDescriptor
+                    functionDescriptor?.apply {
+                        if (this.isInvokeOperator) {
+                            val offset = (element as PsiElement).getFirstChild().endOffset
+                            val text = factory.text(".invoke")
+                            val presentation: InlayPresentation = factory.roundWithBackgroundAndSmallInset(text)
+                            val reference = factory.referenceOnHover(presentation
+                            ) { event, translated -> navigateToFunctionDeclaration(editor.project!!, this) }
+                            sink.addInlineElement(
+                                offset,
+                                true,
+                                reference,
+                                false
+                            )
+                        }
+                    }
                 }
                 return true
             }
         }
+
+    fun navigateToFunctionDeclaration(project: Project, functionDescriptor: CallableDescriptor) {
+        // Resolve the PsiElement from the FunctionDescriptor
+        val sourceElement = (functionDescriptor.source as KotlinSourceElement).psi
+        val psiElement = sourceElement.psiOrParent as PsiElement?
+
+        // Ensure the PsiElement is valid and not null
+        if (psiElement != null && psiElement.isValid) {
+            // Perform the navigation
+            DumbService.getInstance(project).smartInvokeLater {
+                val navigatable = PsiNavigationSupport.getInstance().createNavigatable(
+                    project,
+                    psiElement.containingFile.virtualFile,
+                    psiElement.textOffset
+                )
+                navigatable.navigate(true)
+            }
+        } else {
+            println("Error: Unable to find the declaration for the given FunctionDescriptor.")
+        }
+    }
 }
