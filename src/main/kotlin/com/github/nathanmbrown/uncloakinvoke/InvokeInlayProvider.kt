@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.intentions.isInvokeOperator
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.util.getResolvedCall
@@ -47,22 +48,27 @@ class InvokeInlayProvider : InlayHintsProvider<NoSettings> {
         object : FactoryInlayHintsCollector(editor) {
             override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
                 if (element is KtCallExpression) {
-                    val bindingContext: BindingContext = element.analyze()
-                    val resolvedCall: ResolvedCall<out CallableDescriptor>? = element.getResolvedCall(bindingContext)
-                    val functionDescriptor = resolvedCall?.resultingDescriptor
-                    functionDescriptor?.apply {
-                        if (this.isInvokeOperator) {
-                            val offset = (element as PsiElement).getFirstChild().endOffset
-                            val text = factory.text(".invoke")
-                            val presentation: InlayPresentation = factory.roundWithBackgroundAndSmallInset(text)
-                            val reference = factory.referenceOnHover(presentation
-                            ) { event, translated -> navigateToFunctionDeclaration(editor.project!!, this) }
-                            sink.addInlineElement(
-                                offset,
-                                true,
-                                reference,
-                                false
-                            )
+                    val firstChild: PsiElement? = (element as PsiElement).firstChild
+                    if (firstChild?.text != "invoke") {
+                        val bindingContext: BindingContext = element.analyze()
+                        val resolvedCall: ResolvedCall<out CallableDescriptor>? =
+                            element.getResolvedCall(bindingContext)
+                        val functionDescriptor = resolvedCall?.resultingDescriptor
+                        functionDescriptor?.apply {
+                            if (this.isInvokeOperator) {
+                                val offset = (element as PsiElement).getFirstChild().endOffset
+                                val text = factory.text(".invoke")
+                                val presentation: InlayPresentation = factory.roundWithBackgroundAndSmallInset(text)
+                                val reference = factory.referenceOnHover(presentation) { _, _ ->
+                                    navigateToFunctionDeclaration(editor.project!!, this)
+                                }
+                                sink.addInlineElement(
+                                    offset,
+                                    true,
+                                    reference,
+                                    false
+                                )
+                            }
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-# uncloak-invoke
+# UncloakInvoke
 
 ![Build](https://github.com/nathanmbrown/uncloak-invoke/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
