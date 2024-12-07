@@ -1,8 +1,8 @@
 # UncloakInvoke
 
 ![Build](https://github.com/nathanmbrown/uncloak-invoke/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/25975-uncloak-invoke.svg)](https://plugins.jetbrains.com/plugin/25975-uncloak-invoke)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/25975-uncloak-invoke.svg)](https://plugins.jetbrains.com/plugin/25975-uncloak-invoke)
 
 <!-- Plugin description -->
 This plugin adds a clickable inlay hint for the implicit `invoke` call made when a Kotlin instance with an `operator fun invoke()` method is called as a function.
@@ -17,12 +17,14 @@ class Reverser {
 }
 
 val reverser = Reverser()
-reverser("FooBar") 
+println(reverser(“!dlrow olleH”)) 
 ```
 Navigating to the declaration of `reverser` on the last line will take you to the declaration of the `val reverser`.
 Navigating to the type of `reverser` will take you to the `class Reverser`, but you will still have to locate the invoke method yourself, which is not always straightforward.
 
 The inlay added by this plugin gives you a direct link to the invoke method, which is handy when browsing and debugging code that uses objects as functions.
+                               
+![screenshot.png](screenshot.png)
 
 <!-- Plugin description end -->
 
@@ -35,9 +37,9 @@ The inlay added by this plugin gives you a direct link to the invoke method, whi
   
 - Using JetBrains Marketplace:
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
+  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/25975-uncloak-invoke) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
+  You can also download the [latest release](https://plugins.jetbrains.com/plugin/25975-uncloak-invoke/versions) from JetBrains Marketplace and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
 - Manually:
