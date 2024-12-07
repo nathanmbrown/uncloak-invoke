@@ -24,7 +24,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
-import com.intellij.refactoring.suggested.endOffset
+import com.intellij.psi.util.endOffset
 import com.intellij.ui.dsl.builder.panel
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
