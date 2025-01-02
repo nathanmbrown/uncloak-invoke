@@ -16,4 +16,7 @@
                 isEnabledByDefault="true"/>
     </extensions>
 
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="false" />
+    </extensions>
 </idea-plugin>
